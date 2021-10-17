@@ -1,0 +1,36 @@
+service: bgpopknoledge-api
+
+frameworkVersion: '2'
+
+custom:
+  serverless-offline:
+    httpPort: 4300
+    lambdaPort: 4200
+  serverless-plugin-typescript:
+    tsConfigFileLocation: './tsconfig-api.json'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: '20201221'
+  region: eu-central-1
+  stage: staging
+  httpApi:
+    cors: true
+  environment:
+    STAGING_ENV: true
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-plugin-common-excludes
+  - serverless-plugin-include-dependencies
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+functions:
+  api:
+    handler: src/api/index.handler
+    reservedConcurrency: 50
+    events:
+      - httpApi: '*'
+
