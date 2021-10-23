@@ -1,7 +1,8 @@
-import { Typography } from "antd";
+import { Spin, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useParams, useRoutes } from "react-router";
 import YouTube from "react-youtube";
+import "antd/dist/antd.css";
 import "./App.css";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
@@ -65,18 +66,33 @@ const VideoDetails = () => {
   }, [id]);
 
   if (!id) throw Error("Missing video ID");
-  if (!transcript) return <div>Loading...</div>;
+  if (!transcript)
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Spin size="large" tip="Зарежда се..." />
+      </div>
+    );
 
   return (
     <div style={{ height: "100%" }}>
       <YouTube
-        opts={{ width: '100%', height: '100%', playerVars: { autoplay: 0 } }}
+        opts={{ width: "100%", height: "100%", playerVars: { autoplay: 0 } }}
         containerClassName="video-embedded-video-container"
         onStateChange={handlePlayerStateChange}
         videoId={id}
       />
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <Typography.Title style={{ alignContent: "center" }}>{displayedSubtitle}</Typography.Title>
+      <div style={{ textAlign: "center" }}>
+        <Typography.Title level={2}>
+          {displayedSubtitle}
+        </Typography.Title>
       </div>
     </div>
   );
