@@ -1,8 +1,9 @@
-import express, { Response, Request, NextFunction } from "express";
+import * as express from "express";
+import { Response, Request, NextFunction } from "express"
 import axios from "axios";
-import _ from "lodash";
+import * as _ from "lodash";
 
-import asyncHandler from "express-async-handler";
+import * as asyncHandler from "express-async-handler"
 import YoutubeTranscript from "youtube-transcript";
 
 const DEEPL_API_KEY = process.env.DEEPL_API_KEY

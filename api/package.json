@@ -1,6 +1,5 @@
 {
   "private": true,
-  "type": "module",
   "dependencies": {
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
@@ -13,6 +12,7 @@
   },
   "scripts": {
     "start": "sls offline start --stage development --config serverless.yml --watch",
+    "deploy-production": "cross-env NODE_ENV=production sls deploy --stage production --config serverless.yml",
     "test": "jest",
     "prettier-check": "prettier --config=\"prettier.config.js\" --check \"src/**/*.ts\" ",
     "prettier-write": "prettier --config=\"prettier.config.js\" --write \"src/**/*.ts\" "

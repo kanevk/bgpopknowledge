@@ -9,16 +9,15 @@ custom:
   serverless-plugin-typescript:
     tsConfigFileLocation: './tsconfig-api.json'
 
+
 provider:
   name: aws
   runtime: nodejs14.x
   lambdaHashingVersion: '20201221'
-  region: eu-central-1
-  stage: staging
+  profile: kkanev-opensource # is the profile name in your .aws/credentials file
+  region: eu-west-1
   httpApi:
     cors: true
-  environment:
-    STAGING_ENV: true
 
 plugins:
   - serverless-plugin-typescript
@@ -33,4 +32,3 @@ functions:
     reservedConcurrency: 50
     events:
       - httpApi: '*'
-
