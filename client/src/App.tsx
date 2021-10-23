@@ -1,3 +1,4 @@
+import { Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useParams, useRoutes } from "react-router";
 import YouTube from "react-youtube";
@@ -18,7 +19,7 @@ const App = () => {
       element: <div>404</div>,
     },
   ]);
-}
+};
 
 const VideoDetails = () => {
   const { id } = useParams();
@@ -67,14 +68,15 @@ const VideoDetails = () => {
   if (!transcript) return <div>Loading...</div>;
 
   return (
-    <div>
+    <div style={{ height: "100%" }}>
       <YouTube
-        opts={{ width: "100%", height: "500px", playerVars: { autoplay: 0 } }}
+        opts={{ width: '100%', height: '100%', playerVars: { autoplay: 0 } }}
+        containerClassName="video-embedded-video-container"
         onStateChange={handlePlayerStateChange}
         videoId={id}
       />
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <h1 style={{ alignContent: "center" }}>{displayedSubtitle}</h1>
+        <Typography.Title style={{ alignContent: "center" }}>{displayedSubtitle}</Typography.Title>
       </div>
     </div>
   );
