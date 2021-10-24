@@ -84,15 +84,13 @@ const VideoDetails = () => {
   return (
     <div style={{ height: "100%" }}>
       <YouTube
-        opts={{ width: "100%", height: "100%", playerVars: { autoplay: 0 } }}
+        opts={{ width: "100%", height: "100%", playerVars: { autoplay: 1 } }}
         containerClassName="video-embedded-video-container"
         onStateChange={handlePlayerStateChange}
         videoId={id}
       />
       <div style={{ textAlign: "center" }}>
-        <Typography.Title level={2}>
-          {displayedSubtitle}
-        </Typography.Title>
+        <Typography.Title level={2}>{displayedSubtitle}</Typography.Title>
       </div>
     </div>
   );
