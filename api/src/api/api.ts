@@ -30,10 +30,10 @@ app.get(
       return;
     }
 
-    const transcript = await YoutubeTranscript.fetchTranscript(videoId);
+    const transcript = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'en', country: 'uk' });
     const transcriptTextInEnglish = transcript
       .map((ch) => ch.text)
-      .join(" #$# ");
+      .join(" $##$ ");
 
     const translateResp = await axios.post(
       `https://api.deepl.com/v2/translate`,
@@ -53,7 +53,7 @@ app.get(
 
     const translatedChunks = (
       translateResp.data.translations[0].text as string
-    ).split(" #$# ");
+    ).split("$##$");
 
     const translatedTranscript = _.zip(
       transcript.slice(0, translatedChunks.length),
