@@ -16,6 +16,7 @@ provider:
   lambdaHashingVersion: '20201221'
   profile: kkanev-opensource # is the profile name in your .aws/credentials file
   region: eu-west-1
+  timeout: 15
   httpApi:
     cors: true
 
