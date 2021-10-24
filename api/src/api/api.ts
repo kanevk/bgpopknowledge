@@ -1,12 +1,22 @@
 import * as express from "express";
-import { Response, Request, NextFunction } from "express"
+import { Response, Request, NextFunction } from "express";
 import axios from "axios";
 import * as _ from "lodash";
+import * as querystring from "querystring";
 
-import * as asyncHandler from "express-async-handler"
+import * as asyncHandler from "express-async-handler";
 import YoutubeTranscript from "youtube-transcript";
+import Airtable = require("airtable");
 
-const DEEPL_API_KEY = process.env.DEEPL_API_KEY
+const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
+if (!DEEPL_API_KEY) throw Error(`DEEPL_API_KEY not set - ${DEEPL_API_KEY}`);
+
+const AIRTABLE_KEY = process.env.AIRTABLE_KEY;
+if (!AIRTABLE_KEY) throw Error(`AIRTABLE_KEY not set - ${AIRTABLE_KEY}`);
+
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+if (!AIRTABLE_BASE_ID)
+  throw Error(`AIRTABLE_BASE_ID not set - ${AIRTABLE_BASE_ID}`);
 
 const app = express();
 
@@ -14,37 +24,51 @@ app.get(
   "/yt/transcript/v/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const videoId = req.params.id;
+    const cachedValue = await cacheGet(`video:${videoId}`);
+    if (cachedValue) {
+      res.json(cachedValue);
+      return;
+    }
 
     const transcript = await YoutubeTranscript.fetchTranscript(videoId);
-    const transcriptTextInEnglish = transcript.map((ch) => ch.text).join(" #$# ");
+    const transcriptTextInEnglish = transcript
+      .map((ch) => ch.text)
+      .join(" #$# ");
 
     const translateResp = await axios.post(
-      `https://api-free.deepl.com/v2/translate?auth_key=${DEEPL_API_KEY}`,
-      {},
+      `https://api.deepl.com/v2/translate`,
+      querystring.stringify({
+        text: transcriptTextInEnglish,
+      }),
       {
         params: {
-          text: transcriptTextInEnglish.slice(0, 500),
-          source_lang: "EN",
           target_lang: "BG",
+        },
+        headers: {
+          Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}`,
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       },
     );
 
-    const translatedChunks = (translateResp.data.translations[0].text as string).split(' #$# ')
+    const translatedChunks = (
+      translateResp.data.translations[0].text as string
+    ).split(" #$# ");
 
-    const translatedTranscript = _.zip(transcript.slice(0, translatedChunks.length), translatedChunks).map(([transcriptFrame, translatedText]) => {
+    const translatedTranscript = _.zip(
+      transcript.slice(0, translatedChunks.length),
+      translatedChunks,
+    ).map(([transcriptFrame, translatedText]) => {
       return {
         ...transcriptFrame,
-        translatedText
-      }
-    })
+        translatedText,
+      };
+    });
 
-    const quotaCheck = await axios.get(`https://api-free.deepl.com/v2/usage?auth_key=${DEEPL_API_KEY}`)
-    const quotaData = {
-      character_count: quotaCheck.data.character_count,
-      utilizationPct: (quotaCheck.data.character_count * 100 / quotaCheck.data.character_limit).toFixed(2),
-    }
-    res.json({ transcript: translatedTranscript, textTotalSize: transcriptTextInEnglish.length, ...quotaData});
+    res.json(await cacheSet(`video:${videoId}`, {
+      transcript: translatedTranscript,
+      textTotalSize: transcriptTextInEnglish.length,
+    }));
   }),
 );
 
@@ -63,3 +87,51 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 export default app;
+
+const cacheGet = async (key: string) => {
+  const airbase = new Airtable({ apiKey: AIRTABLE_KEY }).base(AIRTABLE_BASE_ID);
+  const Cache = airbase<{ key: string; value: string }>("cache");
+  const [cacheRow] = await Cache.select({
+    filterByFormula: `{key} = '${key}'`,
+    fields: ["value"],
+  }).all();
+
+  return cacheRow ? JSON.parse(cacheRow.fields["value"]) : null;
+};
+
+const cacheSet = async (key: string, value: Record<string, any>) => {
+  const airbase = new Airtable({ apiKey: AIRTABLE_KEY }).base(AIRTABLE_BASE_ID);
+  const Cache = airbase("cache");
+  await createAirRecord(Cache, { key, value: JSON.stringify(value) })
+
+  return value;
+};
+
+const createAirRecord = async (
+  table: {
+    create: (
+      records: any[],
+      clb: (err: Error | null, records: any[]) => any,
+    ) => any;
+  },
+  fields: Record<string, any>,
+) => {
+  return new Promise((resolve, reject) => {
+    table.create(
+      [
+        {
+          fields,
+        },
+      ],
+      (err, _records) => {
+        if (err) {
+          console.error(err);
+          reject(false);
+          return;
+        }
+
+        resolve(true);
+      },
+    );
+  });
+};
