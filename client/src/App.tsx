@@ -2,6 +2,7 @@ import { Spin, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useParams, useRoutes } from "react-router";
 import YouTube from "react-youtube";
+import ReactGA from 'react-ga';
 import "antd/dist/antd.css";
 import "./App.css";
 
@@ -10,6 +11,11 @@ const API_BASE = process.env.REACT_APP_API_BASE;
 if (!API_BASE) throw Error("Provide value for API_BASE");
 
 const App = () => {
+  useEffect(() => {
+    ReactGA.initialize('G-R93DDV6WSY', { debug: process.env.NODE_ENV !== 'production' });
+  }, [])
+
+
   return useRoutes([
     {
       path: "/video/:id",
@@ -55,6 +61,10 @@ const VideoDetails = () => {
     } else if (event.data === YouTube.PlayerState.PAUSED) {
     }
   };
+
+  useEffect(() => {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+  }, [])
 
   useEffect(() => {
     (async () => {
