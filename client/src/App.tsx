@@ -90,7 +90,7 @@ const VideoDetails = () => {
         videoId={id}
       />
       <div style={{ textAlign: "center" }}>
-        <Typography.Title level={2}>{displayedSubtitle}</Typography.Title>
+        <Typography.Title level={3}>{displayedSubtitle}</Typography.Title>
       </div>
     </div>
   );
