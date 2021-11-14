@@ -6,8 +6,8 @@ import _ from "lodash";
 
 import * as querystring from "querystring";
 
-import { cacheSet, cacheGet } from '../../../lib/airtable';
-import { DEEPL_API_KEY } from '../../../lib/config';
+import { cacheSet, cacheGet } from '../../../../lib/airtable';
+import { DEEPL_API_KEY } from '../../../../lib/config';
 
 type ResponseData = {
   transcript: {
