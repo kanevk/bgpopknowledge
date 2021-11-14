@@ -1,35 +1,19 @@
-import { Spin, Typography } from "antd";
+import { useRouter } from "next/router";
+
+import { Typography, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useParams, useRoutes } from "react-router";
 import YouTube from "react-youtube";
-import ReactGA from 'react-ga';
-import "antd/dist/antd.css";
-import "./App.css";
+import ReactGA from "react-ga";
+import { NextPage } from "next";
 
-const API_BASE = process.env.REACT_APP_API_BASE;
+import styles from "../../styles/Video.module.css";
 
-if (!API_BASE) throw Error("Provide value for API_BASE");
+type Props = {};
 
-const App = () => {
-  useEffect(() => {
-    ReactGA.initialize('G-R93DDV6WSY', { debug: process.env.NODE_ENV !== 'production' });
-  }, [])
+const VideoDetails: NextPage<Props> = () => {
+  const router = useRouter();
+  const { id } = router.query;
 
-
-  return useRoutes([
-    {
-      path: "/video/:id",
-      element: <VideoDetails />,
-    },
-    {
-      path: "*",
-      element: <div>404</div>,
-    },
-  ]);
-};
-
-const VideoDetails = () => {
-  const { id } = useParams();
   const [transcript, setTranscript] = useState<Array<{
     text: string;
     duration: number;
@@ -64,46 +48,51 @@ const VideoDetails = () => {
 
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
-  }, [])
+  }, []);
 
   useEffect(() => {
     (async () => {
-      const resp = await fetch(`${API_BASE}/yt/transcript/v/${id}`);
+      if (!id) return;
+
+      const resp = await fetch(`/api/video-transcripts/${id}`);
       const { transcript } = await resp.json();
       setTranscript(transcript);
       console.log(transcript);
     })();
   }, [id]);
 
-  if (!id) throw Error("Missing video ID");
   if (!transcript)
     return (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Spin size="large" tip="Зарежда се..." />
-      </div>
+      <main className={styles.main}>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      </main>
     );
 
   return (
-    <div style={{ height: "100%" }}>
-      <YouTube
-        opts={{ width: "100%", height: "100%", playerVars: { autoplay: 1 } }}
-        containerClassName="video-embedded-video-container"
-        onStateChange={handlePlayerStateChange}
-        videoId={id}
-      />
-      <div style={{ textAlign: "center" }}>
-        <Typography.Title level={3}>{displayedSubtitle}</Typography.Title>
+    <main className={styles.main}>
+      <div style={{ height: "100%" }}>
+        <YouTube
+          opts={{ width: "100%", height: "100%", playerVars: { autoplay: 1 } }}
+          containerClassName={styles["video-embedded-video-container"]}
+          onStateChange={handlePlayerStateChange}
+          videoId={id}
+        />
+        <div style={{ textAlign: "center" }}>
+          <Typography variant="h3">{displayedSubtitle}</Typography>
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 
-export default App;
+export default VideoDetails;
