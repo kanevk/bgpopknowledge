@@ -12,7 +12,7 @@ type Props = {};
 
 const VideoDetails: NextPage<Props> = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const id = router.query.id as string | undefined;
 
   const [transcript, setTranscript] = useState<Array<{
     text: string;
