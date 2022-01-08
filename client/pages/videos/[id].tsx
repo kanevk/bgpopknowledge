@@ -19,24 +19,25 @@ const VideoHead = ({ videoData }: { videoData: VideoData | null }) => {
       <meta property="og:image:width" content="400" />
       <meta property="og:image:height" content="400" />
     </>
-  )
+  );
   return (
-      <Head>
-        <title>Учи.се.бе</title>
-        <link rel="icon" href="/favicon.jpeg" />
-        {tags}
-      </Head>
-  )
-}
+    <Head>
+      <title>Учи.се.бе</title>
+      <link rel="icon" href="/favicon.jpeg" />
+      {tags}
+    </Head>
+  );
+};
 
 type VideoData = {
-    title: string;
-    thumbnails: {
-      default: { url: string };
-      medium: { url: string };
-      high: { url: string };
-    };
+  title: string;
+  thumbnails: {
+    default: { url: string };
+    medium: { url: string };
+    high: { url: string };
+  };
 };
+let loadSubtitlesIntervalId: NodeJS.Timer;
 
 const VideoDetails: NextPage<Props> = () => {
   const router = useRouter();
@@ -57,22 +58,31 @@ const VideoDetails: NextPage<Props> = () => {
 
     if (event.data === YouTube.PlayerState.PLAYING) {
       const currentTime = event.target.getCurrentTime();
-      setTimeout(() => {
-        const transcripts = transcript.filter(
-          (transcriptChunk) => transcriptChunk.offset > currentTime * 1000,
-        );
+      console.log("Playing.");
+      const transcripts = transcript.filter(
+        (transcriptChunk) => transcriptChunk.offset > currentTime * 1000,
+      );
 
-        var i = 0;
-        setInterval(() => {
-          const currentTime = event.target.getCurrentTime();
-          if (currentTime * 1000 >= transcripts[i].offset) {
-            console.log(transcripts[i].translatedText);
-            setDisplayedSubtitle(transcripts[i].translatedText);
-            i += 1;
-          }
-        }, 10);
-      }, 0);
+      var i = 0;
+      loadSubtitlesIntervalId = setInterval(() => {
+        const currentTime = event.target.getCurrentTime();
+        if (!transcripts[i]) return console.log("No transcript.");
+
+        setDisplayedSubtitle(transcripts[i].translatedText);
+
+        if (currentTime * 1000 >= transcripts[i].offset + transcripts[i].duration) {
+          console.log(currentTime * 1000, transcripts[i].offset + transcripts[i].duration)
+
+          i += 1;
+          console.log(transcripts[i].translatedText);
+        }
+      }, 50);
     } else if (event.data === YouTube.PlayerState.PAUSED) {
+      console.log("Paused.");
+      clearInterval(loadSubtitlesIntervalId);
+    } else if (event.data === YouTube.PlayerState.ENDED) {
+      console.log("Ended.");
+      clearInterval(loadSubtitlesIntervalId);
     }
   };
 
@@ -104,22 +114,22 @@ const VideoDetails: NextPage<Props> = () => {
 
   if (!transcript)
     return (
-    <div className={styles.container}>
-      <VideoHead videoData={videoData} />
+      <div className={styles.container}>
+        <VideoHead videoData={videoData} />
 
-      <main className={styles.main}>
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <CircularProgress />
-        </div>
-      </main>
+        <main className={styles.main}>
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        </main>
       </div>
     );
 

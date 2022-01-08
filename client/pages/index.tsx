@@ -9,8 +9,8 @@ const Home: NextPage = () => {
     <div className={styles.container}>
       <Head>
         <title>На Български</title>
-        <meta name="description" content="Общо описание" />
         <link rel="icon" href="/favicon.jpeg" />
+        <meta name="description" content="Общо описание" />
         <meta property="og:title" content="Test test" />
         <meta property="og:image" content="https://www.popsci.com/uploads/2019/03/18/5FNEGA7NKCLLWO3PUHR3KV663A.png" />
         <meta property="og:image:width" content="600" />
