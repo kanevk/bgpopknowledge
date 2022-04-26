@@ -2,7 +2,7 @@
   "name": "client-next",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "PORT=3333 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -11,8 +11,10 @@
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
     "@mui/material": "^5.1.0",
+    "@nhost/nhost-js": "^0.3.11",
     "airtable": "^0.11.1",
     "axios": "^0.24.0",
+    "form-data": "^4.0.0",
     "lodash": "^4.17.21",
     "next": "12.0.3",
     "react": "17.0.2",
