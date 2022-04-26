@@ -37,17 +37,19 @@ export default async function handler(
 
   const translatedChunks = await Promise.all(
     chunk(fullTranscript, 300).map(async (transcript) => {
+      console.log("transcript.length", transcript.length);
       const transcriptTextInEnglish = transcript.map((ch) => ch.text);
+      const formData = new URLSearchParams(
+        transcriptTextInEnglish.map((t) => ["text", t] as [string, string]),
+      );
+      console.log(formData.toString().slice(0, 20));
 
       const translateResp = await axios.post(
         `https://api.deepl.com/v2/translate`,
-        new URLSearchParams({
-          text: transcriptTextInEnglish.join(' \n\n ')
-        }),
+        formData,
         {
           params: {
             target_lang: "BG",
-            preserve_formatting: '1',
           },
           headers: {
             Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}`,
@@ -57,10 +59,16 @@ export default async function handler(
       );
 
       if (translateResp.status !== 200) {
-        console.log('Error', JSON.stringify(translateResp.data))
+        console.log("Error", JSON.stringify(translateResp.data));
       }
 
-      const translatedChunk = (translateResp.data.translations[0].text as String).split('\n\n')
+      console.log(
+        `[Translate Response] translations: ${translateResp.data.translations.length}`,
+      );
+
+      const translatedChunk = translateResp.data.translations.map(
+        (translation: any) => translation.text as String,
+      );
       console.log("translatedChunk.length", translatedChunk.length);
 
       return translatedChunk;
@@ -89,7 +97,7 @@ export default async function handler(
   console.log(
     "translatedTranscript",
     translatedTranscript.length,
-    translatedTranscript.slice(0, 5),
+    translatedTranscript.slice(0, 2),
   );
 
   res.json(
