@@ -1,6 +1,11 @@
 import { useRouter } from "next/router";
 
-import { Typography, CircularProgress } from "@mui/material";
+import {
+  Typography,
+  CircularProgress,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import YouTube from "react-youtube";
 import ReactGA from "react-ga";
@@ -41,6 +46,9 @@ let loadSubtitlesIntervalId: NodeJS.Timer;
 
 const VideoDetails: NextPage<Props> = () => {
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const id = router.query.id as string | undefined;
 
   const [videoData, setVideoData] = useState<VideoData | null>(null);
@@ -70,8 +78,14 @@ const VideoDetails: NextPage<Props> = () => {
 
         setDisplayedSubtitle(transcripts[i].translatedText);
 
-        if (currentTime * 1000 >= transcripts[i].offset + transcripts[i].duration) {
-          console.log(currentTime * 1000, transcripts[i].offset + transcripts[i].duration)
+        if (
+          currentTime * 1000 >=
+          transcripts[i].offset + transcripts[i].duration
+        ) {
+          console.log(
+            currentTime * 1000,
+            transcripts[i].offset + transcripts[i].duration,
+          );
 
           i += 1;
           console.log(transcripts[i].translatedText);
@@ -150,7 +164,11 @@ const VideoDetails: NextPage<Props> = () => {
             videoId={id}
           />
           <div style={{ textAlign: "center" }}>
-            <Typography variant="h3">{displayedSubtitle}</Typography>
+            {isMobile ? (
+              <Typography variant="h5">{displayedSubtitle}</Typography>
+            ) : (
+              <Typography variant="h3">{displayedSubtitle}</Typography>
+            )}
           </div>
         </div>
       </main>
