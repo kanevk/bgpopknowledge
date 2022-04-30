@@ -13,6 +13,7 @@ import { GetServerSideProps, NextPage } from "next";
 
 import styles from "../../styles/Video.module.css";
 import Layout from "../../components/layout";
+import axios from "axios";
 
 type Props = {
   videoData: VideoData;
@@ -175,17 +176,21 @@ export const getServerSideProps: GetServerSideProps<
   if (!params?.id)
     throw Error(`Missing videoId in params ${JSON.stringify(params)}`);
 
-  const resp = await fetch(
+  const resp = await axios.get(
     `https://www.googleapis.com/youtube/v3/videos?id=${params.id}&key=AIzaSyDLlmnYxncM9E5pCday8wlFY72bfu7u_Bw&part=snippet&fields=items(id,snippet(title,thumbnails))&i18nLanguage=bg`,
   );
-  const { items } = await resp.json();
+
+  if (resp.status !== 200)
+    throw Error(`Couldn't fetch data for video ${params.id}`);
+
+  const { items } = await resp.data;
   console.log(items);
 
   const videoData: VideoData = items[0].snippet;
 
   return {
     props: {
-      videoData
+      videoData,
     },
   };
 };
