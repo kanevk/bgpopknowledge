@@ -91,7 +91,7 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
     (async () => {
       if (!id) return;
 
-      const resp = await fetch(`/api/videos/${id}/transcript`);
+      const resp = await fetch(`/api/video-transcript/${id}`);
       const { transcript } = await resp.json();
       setTranscript(transcript);
       console.log(transcript);
