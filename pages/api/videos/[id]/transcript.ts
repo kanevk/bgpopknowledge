@@ -4,8 +4,6 @@ import axios from "axios";
 import YoutubeTranscript from "youtube-transcript";
 import _, { chunk, flatMap } from "lodash";
 
-import * as querystring from "querystring";
-
 import { cacheSet, cacheGet } from "../../../../lib/hasuraCache";
 import { DEEPL_API_KEY } from "../../../../lib/config";
 import { URLSearchParams } from "url";
