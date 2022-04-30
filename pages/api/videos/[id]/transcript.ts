@@ -35,8 +35,8 @@ export default async function handler(
     country: "uk",
   });
 
-  const translatedChunks = await Promise.all(
-    chunk(fullTranscript, 300).map(async (transcript) => {
+  const translatedTuplesInChunks = await Promise.all(
+    chunk(fullTranscript, 250).map(async (transcript) => {
       console.log("transcript.length", transcript.length);
       const transcriptTextInEnglish = transcript.map((ch) => ch.text);
       const formData = new URLSearchParams(
@@ -66,31 +66,38 @@ export default async function handler(
         `[Translate Response] translations: ${translateResp.data.translations.length}`,
       );
 
-      const translatedChunk = translateResp.data.translations.map(
-        (translation: any) => translation.text as String,
-      );
+      const translatedChunk = (
+        translateResp.data.translations as { text: string }[]
+      ).map((translation) => translation.text);
       console.log("translatedChunk.length", translatedChunk.length);
 
-      return translatedChunk;
+      return _.zip(transcriptTextInEnglish, translatedChunk);
     }),
   );
-  console.log("fullTranscript", translatedChunks.length);
+  console.log("fullTranscript chunks", translatedTuplesInChunks.length);
 
-  const translatedWords = flatMap(translatedChunks);
+  const translatedPairs = flatMap(translatedTuplesInChunks);
 
   console.log("fullTranscript", fullTranscript.length);
-  console.log("translatedWords", translatedWords.length);
+  console.log("translatedWords", translatedPairs.length);
+  if (fullTranscript.length !== translatedPairs.length)
+    throw Error("Missing translations");
 
   const translatedTranscript = _.zip(
-    fullTranscript.slice(0, translatedWords.length),
-    translatedWords,
-  ).map(([transcriptFrame, translatedText]) => {
-    if (!transcriptFrame || !translatedText)
-      throw "Not fully translated transcript";
+    fullTranscript.slice(0, translatedPairs.length),
+    translatedPairs,
+  ).map(([transcriptFrame, translatedPair]) => {
+    if (!transcriptFrame || !translatedPair)
+      throw Error("Not fully translated transcript");
+
+    if (translatedPair[0] !== transcriptFrame.text)
+      throw Error(
+        `Translation mismatch, expected: ${transcriptFrame}, got: ${translatedPair[0]}`,
+      );
 
     return {
       ...transcriptFrame,
-      translatedText,
+      translatedText: translatedPair[1]!,
     };
   });
 

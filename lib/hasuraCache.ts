@@ -19,14 +19,16 @@ const cacheGet = async (key: string) => {
   return cachedValue ? cachedValue : null;
 };
 
-type CacheFields = {
-  key: string;
-  value: string;
-};
 const cacheSet = async <T>(key: string, value: T) => {
   const response = await nhost.graphql.request(
     `mutation upsertCache($key: String!, $value: json) {
-      insert_cache_one(object: {key: $key, value: $value}, on_conflict: {constraint: general_cache_pkey}) {
+      insert_cache_one(
+        object: {key: $key, value: $value}
+        on_conflict: {
+          constraint: general_cache_pkey
+          update_columns: [value]
+        }
+      ) {
         key
       }
   }`,

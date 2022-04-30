@@ -88,7 +88,7 @@ const VideoDetails: NextPage<Props> = () => {
           );
 
           i += 1;
-          console.log(transcripts[i].translatedText);
+          console.log(transcripts[i].text, transcripts[i].translatedText);
         }
       }, 50);
     } else if (event.data === YouTube.PlayerState.PAUSED) {
