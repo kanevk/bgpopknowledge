@@ -12,7 +12,6 @@ import ReactGA from "react-ga";
 import { GetServerSideProps, NextPage } from "next";
 
 import styles from "../../styles/Video.module.css";
-import { cacheGet, cacheSet } from "../../lib/hasuraCache";
 import Layout from "../../components/layout";
 
 type Props = {
@@ -176,16 +175,6 @@ export const getServerSideProps: GetServerSideProps<
   if (!params?.id)
     throw Error(`Missing videoId in params ${JSON.stringify(params)}`);
 
-  // @ts-ignore
-  const cachedData: VideoData | null = await cacheGet(`video-data:${params.id}`)
-  if (cachedData) {
-    return {
-      props: {
-        videoData: cachedData
-      }
-    }
-  }
-
   const resp = await fetch(
     `https://www.googleapis.com/youtube/v3/videos?id=${params.id}&key=AIzaSyDLlmnYxncM9E5pCday8wlFY72bfu7u_Bw&part=snippet&fields=items(id,snippet(title,thumbnails))&i18nLanguage=bg`,
   );
@@ -196,7 +185,7 @@ export const getServerSideProps: GetServerSideProps<
 
   return {
     props: {
-      videoData: await cacheSet(`video-data:${params.id}`, videoData),
+      videoData
     },
   };
 };
