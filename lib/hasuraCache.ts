@@ -16,6 +16,8 @@ const cacheGet = async (key: string) => {
 
   const cachedValue = (response.data as { hit?: { value: Record<string, any> } }).hit?.value;
 
+  if (cachedValue) console.log(`[Cache] cache hit for key: "${key}"`)
+
   return cachedValue ? cachedValue : null;
 };
 

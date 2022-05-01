@@ -1,4 +1,5 @@
 import axios from "axios";
+import { cacheGet, cacheSet } from "./hasuraCache";
 
 type Thumbnail = {
   url: string;
@@ -15,6 +16,12 @@ export type VideoData = {
 };
 
 const getVideoData = async ({ videoId }: { videoId: string }) => {
+  const cachedData = await cacheGet(`video-data:${videoId}`)
+
+  if (cachedData) {
+    return cachedData
+  }
+
   const resp = await axios.get(
     `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=AIzaSyDLlmnYxncM9E5pCday8wlFY72bfu7u_Bw&part=snippet&fields=items(id,snippet(title,thumbnails))&i18nLanguage=bg`,
   );
@@ -25,7 +32,7 @@ const getVideoData = async ({ videoId }: { videoId: string }) => {
   const { items } = await resp.data;
   console.log(items);
 
-  return items[0].snippet as VideoData;
+  return await cacheSet(`video-data:${videoId}`, items[0].snippet as VideoData);
 };
 
 export default getVideoData;
