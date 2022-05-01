@@ -16,12 +16,12 @@ const Home: NextPage = () => {
           <ul>
             <li>
               <Link href="/videos/lXfEK8G8CUI">
-                <a>How the immune system actually works</a>
+                How the immune system actually works
               </Link>
             </li>
             <li>
               <Link href="/videos/X9GRsZvvvik">
-                <a>Ukraine War: Putin says Mariupol situation is ...</a>
+                Ukraine War: Putin says Mariupol situation is ...
               </Link>
             </li>
           </ul>
