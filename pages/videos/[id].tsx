@@ -96,7 +96,10 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
       <VideoDetailsLayout
         pageTitle={videoData.title}
         previewImageUrl={
-          videoData.thumbnails.maxres.url || videoData.thumbnails.standard.url
+          videoData.thumbnails?.maxres?.url ||
+          videoData.thumbnails?.standard?.url ||
+          videoData.thumbnails?.high?.url ||
+          videoData.thumbnails?.medium?.url
         }
       >
         <div
@@ -118,7 +121,10 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
     <VideoDetailsLayout
       pageTitle={videoData.title}
       previewImageUrl={
-        videoData.thumbnails.maxres.url || videoData.thumbnails.standard.url
+        videoData.thumbnails?.maxres?.url ||
+        videoData.thumbnails?.standard?.url ||
+        videoData.thumbnails?.high?.url ||
+        videoData.thumbnails?.medium?.url
       }
     >
       <div style={{ height: "100%" }}>

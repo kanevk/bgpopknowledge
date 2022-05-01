@@ -1,12 +1,17 @@
 import axios from "axios";
 
 type Thumbnail = {
-url: string; width: number; height: number
-}
+  url: string;
+  width: number;
+  height: number;
+};
 
 export type VideoData = {
   title: string;
-  thumbnails: Record<'default' | 'medium' | 'high' | 'standard' | 'maxres', Thumbnail>;
+  thumbnails: Record<
+    "default" | "medium" | "high" | "standard" | "maxres",
+    Thumbnail | undefined
+  >;
 };
 
 const getVideoData = async ({ videoId }: { videoId: string }) => {
@@ -20,7 +25,7 @@ const getVideoData = async ({ videoId }: { videoId: string }) => {
   const { items } = await resp.data;
   console.log(items);
 
-  return items[0].snippet as VideoData
+  return items[0].snippet as VideoData;
 };
 
 export default getVideoData;
