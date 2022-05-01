@@ -41,6 +41,18 @@ export default function Layout({
             <meta property="og:image:height" content="600" /> */}
           </>
         )}
+
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-YN38HXPXGN"
+        ></script>
+        <script>
+          {`window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-YN38HXPXGN');`}
+        </script>
       </Head>
 
       <Script id="hotjar">
