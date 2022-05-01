@@ -19,7 +19,7 @@ const getVideoData = async ({ videoId }: { videoId: string }) => {
   const cachedData = await cacheGet(`video-data:${videoId}`)
 
   if (cachedData) {
-    return cachedData
+    return cachedData as VideoData;
   }
 
   const resp = await axios.get(
