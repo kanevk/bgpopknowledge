@@ -1,12 +1,12 @@
 import axios from "axios";
 
-type VideoData = {
+type Thumbnail = {
+url: string; width: number; height: number
+}
+
+export type VideoData = {
   title: string;
-  thumbnails: {
-    default: { url: string };
-    medium: { url: string };
-    high: { url: string };
-  };
+  thumbnails: Record<'default' | 'medium' | 'high' | 'standard' | 'maxres', Thumbnail>;
 };
 
 const getVideoData = async ({ videoId }: { videoId: string }) => {

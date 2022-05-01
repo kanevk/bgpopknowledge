@@ -25,7 +25,9 @@ export default function Layout({
         {pageTitle && <title>{pageTitle}</title>}
         <link rel="icon" href="/favicon.jpeg" />
         <meta property="og:site_name" content="На Зелено" key="ogsitename" />
-        {pageTitle && <meta property="og:title" content={pageTitle} key="ogtitle" />}
+        {pageTitle && (
+          <meta property="og:title" content={pageTitle} key="ogtitle" />
+        )}
         {description && (
           <meta property="og:description" content={description} key="ogdesc" />
         )}
@@ -33,11 +35,12 @@ export default function Layout({
           <meta property="og:url" content={currentURL} key="ogurl" />
         )}
         {previewImageUrl && (
-          <meta property="og:image" content={previewImageUrl} key="ogimage" />
+          <>
+            <meta property="og:image" content={previewImageUrl} key="ogimage" />
+            {/* <meta property="og:image:width" content="600" />
+            <meta property="og:image:height" content="600" /> */}
+          </>
         )}
-
-          {/* <meta property="og:image:width" content="600" />
-          <meta property="og:image:height" content="600" /> */}
       </Head>
 
       <Script id="hotjar">
@@ -51,9 +54,7 @@ export default function Layout({
     })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`}
       </Script>
 
-      <section style={{height: '100%'}}>
-        {children}
-      </section>
+      <section style={{ height: "100%" }}>{children}</section>
     </>
   );
 }

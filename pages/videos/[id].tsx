@@ -13,38 +13,22 @@ import { GetServerSideProps, NextPage } from "next";
 
 import styles from "../../styles/Video.module.css";
 import Layout from "../../components/layout";
-import axios from "axios";
-import getVideoData from "../../lib/getVideoData";
+import getVideoData, { VideoData } from "../../lib/getVideoData";
 
 type Props = {
   videoData: VideoData;
 };
 
-type VideoData = {
-  title: string;
-  thumbnails: {
-    default: { url: string };
-    medium: { url: string };
-    high: { url: string };
-  };
-};
 let loadSubtitlesIntervalId: NodeJS.Timer;
 
-const VideoDetails: NextPage<Props> = ({
-  videoData = {
-    title: "title",
-    thumbnails: {
-      default: { url: "string" },
-      medium: { url: "string" },
-      high: { url: "string" },
-    },
-  },
-}) => {
+const VideoDetails: NextPage<Props> = ({ videoData }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const id = router.query.id as string | undefined;
+
+  console.log("videoData", videoData);
 
   const [transcript, setTranscript] = useState<Array<{
     text: string;
@@ -53,7 +37,6 @@ const VideoDetails: NextPage<Props> = ({
     translatedText: string;
   }> | null>(null);
   const [displayedSubtitle, setDisplayedSubtitle] = useState("");
-
   const handlePlayerStateChange = (event: { target: any; data: number }) => {
     if (!transcript) return null;
 
@@ -112,7 +95,9 @@ const VideoDetails: NextPage<Props> = ({
     return (
       <VideoDetailsLayout
         pageTitle={videoData.title}
-        previewImageUrl={videoData.thumbnails.default.url}
+        previewImageUrl={
+          videoData.thumbnails.maxres.url || videoData.thumbnails.standard.url
+        }
       >
         <div
           style={{
@@ -132,7 +117,9 @@ const VideoDetails: NextPage<Props> = ({
   return (
     <VideoDetailsLayout
       pageTitle={videoData.title}
-      previewImageUrl={videoData.thumbnails.default.url}
+      previewImageUrl={
+        videoData.thumbnails.maxres.url || videoData.thumbnails.standard.url
+      }
     >
       <div style={{ height: "100%" }}>
         <YouTube
