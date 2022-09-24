@@ -88,7 +88,7 @@ const ArticleDetails: NextPage = () => {
   }, [url, markdownContent]);
 
   console.log("url", router.query);
-  if (!markdownContent) {
+  if (!translatedMarkdownContent) {
     return (
       <VideoDetailsLayout pageTitle={title}>Loading...</VideoDetailsLayout>
     );
@@ -106,6 +106,7 @@ const ArticleDetails: NextPage = () => {
             {url}
           </Link>
         </Box>
+        {/* eslint-disable-next-line */}
         <ReactMarkdown children={translatedMarkdownContent}></ReactMarkdown>
       </Box>
     </VideoDetailsLayout>
