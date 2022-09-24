@@ -95,7 +95,7 @@ const ArticleDetails: NextPage = () => {
   }
 
   return (
-    <VideoDetailsLayout pageTitle="title">
+    <VideoDetailsLayout pageTitle={title}>
       <Box sx={{ marginX: 5 }}>
         <Box sx={{ marginTop: 1, marginBottom: 5 }}>
           <Typography sx={{ marginTop: 5 }} variant="caption">
