@@ -14,18 +14,23 @@
     "@nhost/nhost-js": "^0.3.11",
     "airtable": "^0.11.1",
     "axios": "^0.24.0",
+    "cheerio": "^1.0.0-rc.12",
     "lodash": "^4.17.21",
     "next": "12.0.3",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-ga": "^3.3.0",
+    "react-markdown": "^8.0.3",
     "react-youtube": "^7.13.1",
+    "turndown": "^7.1.1",
     "youtube-transcript": "^1.0.4"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.31",
     "@types/lodash": "^4.14.176",
     "@types/node": "16.11.7",
     "@types/react": "17.0.34",
+    "@types/turndown": "^5.0.1",
     "eslint": "7",
     "eslint-config-next": "12.0.3",
     "typescript": "4.4.4"
