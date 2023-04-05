@@ -50,7 +50,7 @@ const cacheSet = async <T>(key: string, value: T) => {
       insert_cache_one(
         object: {key: $key, value: $value}
         on_conflict: {
-          constraint: general_cache_pkey
+          constraint: cache_pkey
           update_columns: [value]
         }
       ) {
@@ -59,6 +59,8 @@ const cacheSet = async <T>(key: string, value: T) => {
   }`,
     { key, value },
   );
+
+  console.log(response);
 
   if (response.error) {
     throw Error(JSON.stringify(response.error));

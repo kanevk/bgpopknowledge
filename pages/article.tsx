@@ -33,7 +33,9 @@ const ArticleDetails: NextPage = () => {
     const mainContent =
       $?.(mainSectionTag).html() ||
       $?.("article").html() ||
-      $?.("section").html();
+      $?.("section").html() ||
+      $?.("div[id='main-content']").html();
+
     console.log("mainContent", mainContent);
     const turndownService = new TurndownService();
     setMarkdownContent(turndownService.turndown(mainContent!));
