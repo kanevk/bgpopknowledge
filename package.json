@@ -11,7 +11,6 @@
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
     "@mui/material": "^5.1.0",
-    "@nhost/nhost-js": "^0.3.11",
     "airtable": "^0.11.1",
     "axios": "^0.24.0",
     "cheerio": "^1.0.0-rc.12",
