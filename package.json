@@ -22,7 +22,7 @@
     "react-markdown": "^8.0.3",
     "react-youtube": "^7.13.1",
     "turndown": "^7.1.1",
-    "youtube-transcript": "^1.0.4"
+    "youtube-transcript": "^1.2.1"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.31",

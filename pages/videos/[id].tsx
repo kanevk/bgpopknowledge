@@ -5,6 +5,8 @@ import {
   CircularProgress,
   useMediaQuery,
   useTheme,
+  Stack,
+  Link,
 } from "@mui/material";
 import { ReactNode, useEffect, useState } from "react";
 import YouTube from "react-youtube";
@@ -14,6 +16,26 @@ import { GetServerSideProps, NextPage } from "next";
 import styles from "../../styles/Video.module.css";
 import Layout from "../../components/layout";
 import getVideoData, { VideoData } from "../../lib/getVideoData";
+import { FindCurrentTranscript } from "./FindCurrentTranscript";
+
+export type TranscriptLine = {
+  text: string;
+  duration: number;
+  offset: number;
+  translatedText: string;
+};
+
+export type PlayerState =
+  | {
+      playing: true;
+      fromTime: number;
+      target: any;
+    }
+  | {
+      playing: false;
+      fromTime?: null;
+      target?: null;
+    };
 
 type Props = {
   videoData: VideoData;
@@ -30,49 +52,33 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
 
   console.log("videoData", videoData);
 
-  const [transcript, setTranscript] = useState<Array<{
-    text: string;
-    duration: number;
-    offset: number;
-    translatedText: string;
-  }> | null>(null);
+  const [transcript, setTranscript] = useState<Array<TranscriptLine> | null>(
+    null,
+  );
+  const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<PlayerState>({
+    playing: false,
+  });
   const [displayedSubtitle, setDisplayedSubtitle] = useState("");
   const handlePlayerStateChange = (event: { target: any; data: number }) => {
     if (!transcript) return null;
 
     if (event.data === YouTube.PlayerState.PLAYING) {
-      const currentTime = event.target.getCurrentTime();
-      console.log("Playing.");
-      const transcripts = transcript.filter(
-        (transcriptChunk) => transcriptChunk.offset > currentTime * 1000,
-      );
-
-      var i = 0;
-      loadSubtitlesIntervalId = setInterval(() => {
-        const currentTime = event.target.getCurrentTime();
-        if (!transcripts[i]) return console.log("No transcript.");
-
-        setDisplayedSubtitle(transcripts[i].translatedText);
-
-        if (
-          currentTime * 1000 >=
-          transcripts[i].offset + transcripts[i].duration
-        ) {
-          console.log(
-            currentTime * 1000,
-            transcripts[i].offset + transcripts[i].duration,
-          );
-
-          i += 1;
-          console.log(transcripts[i].text, transcripts[i].translatedText);
-        }
-      }, 50);
+      setCurrentPlayer({
+        playing: true,
+        fromTime: event.target.getCurrentTime(),
+        target: event.target,
+      });
     } else if (event.data === YouTube.PlayerState.PAUSED) {
       console.log("Paused.");
-      clearInterval(loadSubtitlesIntervalId);
+      setCurrentPlayer({
+        playing: false,
+      });
     } else if (event.data === YouTube.PlayerState.ENDED) {
+      setCurrentPlayer({
+        playing: false,
+      });
       console.log("Ended.");
-      clearInterval(loadSubtitlesIntervalId);
     }
   };
 
@@ -84,12 +90,45 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
     (async () => {
       if (!id) return;
 
-      const resp = await fetch(`/api/video-transcript/${id}`);
-      const { transcript } = await resp.json();
+      const resp = await fetch(`/api/video-transcript/${id}?sourceLang=en`);
+
+      const { transcript, error } = await resp.json();
+      if (error) {
+        console.error("useEffect video-transcript", error);
+        setLoadingError(error);
+        return;
+      }
+
       setTranscript(transcript);
       console.log(transcript);
     })();
   }, [id]);
+
+  if (loadingError) {
+    return (
+      <VideoDetailsLayout
+        pageTitle={videoData.title}
+        previewImageUrl={
+          videoData.thumbnails?.maxres?.url ||
+          videoData.thumbnails?.standard?.url ||
+          videoData.thumbnails?.high?.url ||
+          videoData.thumbnails?.medium?.url
+        }
+      >
+        <Stack
+          width="100%"
+          height="300px"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Typography variant="h6">Видеото не е преведено</Typography>
+          <Typography variant="subtitle1">
+            Опитайте с друго видео <Link href="/">тук</Link>
+          </Typography>
+        </Stack>
+      </VideoDetailsLayout>
+    );
+  }
 
   if (!transcript) {
     return (
@@ -138,13 +177,31 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
           onStateChange={handlePlayerStateChange}
           videoId={id}
         />
-        <div style={{ textAlign: "center" }}>
-          {isMobile ? (
-            <Typography variant="h5">{displayedSubtitle}</Typography>
-          ) : (
-            <Typography variant="h3">{displayedSubtitle}</Typography>
+        <FindCurrentTranscript transcript={transcript} player={currentPlayer}>
+          {({ currentLines }) => (
+            <div style={{ textAlign: "center" }}>
+              {isMobile ? (
+                <Typography variant="h5">{currentLines.currLine}</Typography>
+              ) : (
+                <>
+                  <Typography
+                    variant="h5"
+                    color={(theme) => theme.palette.text.secondary}
+                  >
+                    {currentLines.prevLine}
+                  </Typography>
+                  <Typography variant="h3">{currentLines.currLine}</Typography>
+                  {/* <Typography
+                    variant="h6"
+                    color={(theme) => theme.palette.text.secondary}
+                  >
+                    {currentLines.nextLine}
+                  </Typography> */}
+                </>
+              )}
+            </div>
           )}
-        </div>
+        </FindCurrentTranscript>
       </div>
     </VideoDetailsLayout>
   );

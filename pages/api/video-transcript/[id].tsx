@@ -1,14 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import YoutubeTranscript from "youtube-transcript";
+import { TranscriptResponse, YoutubeTranscript } from "youtube-transcript";
 import _, { chunk, flatMap } from "lodash";
 
 import { cacheSet, cacheGet } from "../../../lib/hasuraCache";
 import { DEEPL_API_KEY } from "../../../lib/config";
 import { URLSearchParams } from "url";
 
-type ResponseData = {
+type SuccessResponseData = {
   transcript: {
     text: string;
     translatedText: string;
@@ -17,21 +17,50 @@ type ResponseData = {
   }[];
 };
 
+type ErrorResponseData = {
+  error: string;
+};
+
+// Build a function that can console log any object
+const log = (...msgs: any[]) =>
+  console.log(
+    "[Video Transcript]",
+    ...msgs.map((msg) =>
+      typeof msg === "object" ? JSON.stringify(msg, null, 2) : msg,
+    ),
+  );
+
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>,
+  res: NextApiResponse<SuccessResponseData | ErrorResponseData>,
 ) {
+  log("query", `${req.query}`);
   const videoId = req.query.id as string;
+  const sourceLang = (req.query.sourceLang as string) || "en";
   const cachedValue = await cacheGet(`video:${videoId}`);
+  console.log("cachedValue", cachedValue);
   if (cachedValue) {
-    res.json(cachedValue as ResponseData);
+    res.json(cachedValue as SuccessResponseData);
     return;
   }
 
-  const fullTranscript = await YoutubeTranscript.fetchTranscript(videoId, {
-    lang: "en",
-    country: "uk",
-  });
+  let fullTranscript: TranscriptResponse[] = [];
+
+  try {
+    fullTranscript = await YoutubeTranscript.fetchTranscript(videoId, {
+      lang: sourceLang,
+    });
+    console.log(
+      "fullTranscript",
+      fullTranscript.length,
+      fullTranscript.slice(0, 2),
+    );
+  } catch (e: any) {
+    console.error("Error", e);
+    res.status(400).json({ error: e.message });
+    return;
+  }
+  console.log("fullTranscript", fullTranscript.length, fullTranscript);
 
   const translatedTuplesInChunks = await Promise.all(
     chunk(fullTranscript, 250).map(async (transcript) => {
@@ -40,7 +69,7 @@ export default async function handler(
       const formData = new URLSearchParams(
         transcriptTextInEnglish.map((t) => ["text", t] as [string, string]),
       );
-      console.log(formData.toString().slice(0, 20));
+      console.log("formData slice", formData.toString().slice(0, 20));
 
       const translateResp = await axios.post(
         `https://api.deepl.com/v2/translate`,
@@ -55,6 +84,7 @@ export default async function handler(
           },
         },
       );
+      console.log("translateResp", translateResp.status);
 
       if (translateResp.status !== 200) {
         console.log("Error", JSON.stringify(translateResp.data));
@@ -106,7 +136,7 @@ export default async function handler(
   );
 
   res.json(
-    await cacheSet<ResponseData>(`video:${videoId}`, {
+    await cacheSet<SuccessResponseData>(`video:${videoId}`, {
       transcript: translatedTranscript,
     }),
   );

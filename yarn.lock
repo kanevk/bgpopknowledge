@@ -986,11 +986,6 @@ caniuse-lite@^1.0.30001202, caniuse-lite@^1.0.30001219, caniuse-lite@^1.0.300012
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001280.tgz#066a506046ba4be34cde5f74a08db7a396718fb7"
   integrity sha512-kFXwYvHe5rix25uwueBxC569o53J6TpnGu0BEEn+6Lhl2vsnAumRFWEBhDft1fwyo6m1r4i+RqA4+163FpeFcA==
 
-centra@^2.4.2:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/centra/-/centra-2.5.0.tgz#854c30f9a3ff50da49fa69a8cb441aa25aa1e8e8"
-  integrity sha512-CnSF1HD8vOOgNbE4P2fZEhdhfAohvpcF3DSdSvEcSHDAZvr+Xfw73isT8SXJJc3VMBqSwjXhr29/ikHUgFcypg==
-
 chalk@2.4.2, chalk@^2.0.0:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
@@ -3146,13 +3141,6 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-phin@^3.5.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/phin/-/phin-3.6.0.tgz#5c70debfc847d04a1b2bf72409a6c9767bc4d915"
-  integrity sha512-nYY4Qh/yGCoxcwOAS2UfCM8+nVJcbI4f9NC4M4zPAsuswnIIS2aB14uYAbvdxP/4DqzXfrpadT2WQOx9mLDyTA==
-  dependencies:
-    centra "^2.4.2"
-
 picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.3:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.0.tgz#f1f061de8f6a4bf022892e2d128234fb98302972"
@@ -4142,9 +4130,7 @@ youtube-player@5.5.2:
     load-script "^1.0.0"
     sister "^3.0.0"
 
-youtube-transcript@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/youtube-transcript/-/youtube-transcript-1.0.4.tgz#033f730167ff2a1c0c97a57535e010d2f52d2446"
-  integrity sha512-5XtEVlcPyLYHwDQPAE86b9zi3kKBHXfmLqq8N6t6RJvZV9V0+owm/XMBobQszx97fxHIf7PQtwucCkkCaPmpJQ==
-  dependencies:
-    phin "^3.5.0"
+youtube-transcript@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/youtube-transcript/-/youtube-transcript-1.2.1.tgz#dd9ddadb7a3b5882e45574a82663c440634e8765"
+  integrity sha512-TvEGkBaajKw+B6y91ziLuBLsa5cawgowou+Bk0ciGpjELDfAzSzTGXaZmeSSkUeknCPpEr/WGApOHDwV7V+Y9Q==
