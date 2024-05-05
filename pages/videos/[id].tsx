@@ -18,9 +18,17 @@ import Layout from "../../components/layout";
 import getVideoData, { VideoData } from "../../lib/getVideoData";
 import dynamic from "next/dynamic";
 import { PlayerState, TranscriptLine } from "../../components/types";
+import SubtitleRevealer from "../../components/subtitleRevealer";
 
 const FindCurrentTranscript = dynamic(
   () => import("../../components/FindCurrentTranscript"),
+  {
+    ssr: false,
+  },
+);
+
+const DraggableSubtitles = dynamic(
+  () => import("../../components/DraggableSubtitles"),
   {
     ssr: false,
   },
@@ -168,22 +176,28 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
         {currentPlayer && (
           <FindCurrentTranscript transcript={transcript} player={currentPlayer}>
             {({ currentLines }) => (
+              // <DraggableSubtitles transcriptLine={currentLines?.currLine} />
               <div style={{ textAlign: "center" }}>
-                {isMobile ? (
+                {/* {isMobile ? (
                   <Typography variant="h5">{currentLines.currLine}</Typography>
-                ) : (
-                  <>
-                    <Typography
-                      variant="h5"
+                ) : ( */}
+                <>
+                  {/* <Typography
+                      variant="h3"
                       color={(theme) => theme.palette.text.secondary}
                     >
                       {currentLines.prevLine}
-                    </Typography>
+                    </Typography> */}
+                  <SubtitleRevealer
+                    prevLine={currentLines.prevLine}
+                    text={currentLines.currLine}
+                  />
+                  {/*
                     <Typography variant="h3">
                       {currentLines.currLine}
-                    </Typography>
-                  </>
-                )}
+                    </Typography> */}
+                </>
+                {/* )} */}
               </div>
             )}
           </FindCurrentTranscript>
@@ -205,7 +219,7 @@ const VideoDetailsLayout = ({
   return (
     <Layout
       pageTitle={pageTitle}
-      description="Зеления Vbox"
+      description="Преведено YouTubе видео"
       previewImageUrl={previewImageUrl}
     >
       <div className={styles.container}>
