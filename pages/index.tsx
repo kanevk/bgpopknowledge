@@ -34,9 +34,9 @@ const Home: NextPage = () => {
 
   return (
     <Layout
-      pageTitle="На Зелено"
-      description="Зеления Vbox"
-      previewImageUrl="/xp-original.jpeg"
+      pageTitle="Преведи видео"
+      description="Преведи YouTube видео на български"
+      previewImageUrl="/player_play_icon_512px.png"
     >
       <div className={styles.container}>
         <main className={styles.main}>
@@ -46,6 +46,10 @@ const Home: NextPage = () => {
               sx={{ width: isMobile ? 300 : 600 }}
               value={youtubeLink}
               onChange={(e) => setYoutubeLink(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !hasYoutubeLinkError)
+                  openYoutubeLink();
+              }}
             />
             <Tooltip
               title={
