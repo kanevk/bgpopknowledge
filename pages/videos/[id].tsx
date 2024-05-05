@@ -16,26 +16,15 @@ import { GetServerSideProps, NextPage } from "next";
 import styles from "../../styles/Video.module.css";
 import Layout from "../../components/layout";
 import getVideoData, { VideoData } from "../../lib/getVideoData";
-import { FindCurrentTranscript } from "./FindCurrentTranscript";
+import dynamic from "next/dynamic";
+import { PlayerState, TranscriptLine } from "../../components/types";
 
-export type TranscriptLine = {
-  text: string;
-  duration: number;
-  offset: number;
-  translatedText: string;
-};
-
-export type PlayerState =
-  | {
-      playing: true;
-      fromTime: number;
-      target: any;
-    }
-  | {
-      playing: false;
-      fromTime?: null;
-      target?: null;
-    };
+const FindCurrentTranscript = dynamic(
+  () => import("../../components/FindCurrentTranscript"),
+  {
+    ssr: false,
+  },
+);
 
 type Props = {
   videoData: VideoData;
@@ -59,7 +48,6 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
   const [currentPlayer, setCurrentPlayer] = useState<PlayerState>({
     playing: false,
   });
-  const [displayedSubtitle, setDisplayedSubtitle] = useState("");
   const handlePlayerStateChange = (event: { target: any; data: number }) => {
     if (!transcript) return null;
 
@@ -177,31 +165,29 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
           onStateChange={handlePlayerStateChange}
           videoId={id}
         />
-        <FindCurrentTranscript transcript={transcript} player={currentPlayer}>
-          {({ currentLines }) => (
-            <div style={{ textAlign: "center" }}>
-              {isMobile ? (
-                <Typography variant="h5">{currentLines.currLine}</Typography>
-              ) : (
-                <>
-                  <Typography
-                    variant="h5"
-                    color={(theme) => theme.palette.text.secondary}
-                  >
-                    {currentLines.prevLine}
-                  </Typography>
-                  <Typography variant="h3">{currentLines.currLine}</Typography>
-                  {/* <Typography
-                    variant="h6"
-                    color={(theme) => theme.palette.text.secondary}
-                  >
-                    {currentLines.nextLine}
-                  </Typography> */}
-                </>
-              )}
-            </div>
-          )}
-        </FindCurrentTranscript>
+        {currentPlayer && (
+          <FindCurrentTranscript transcript={transcript} player={currentPlayer}>
+            {({ currentLines }) => (
+              <div style={{ textAlign: "center" }}>
+                {isMobile ? (
+                  <Typography variant="h5">{currentLines.currLine}</Typography>
+                ) : (
+                  <>
+                    <Typography
+                      variant="h5"
+                      color={(theme) => theme.palette.text.secondary}
+                    >
+                      {currentLines.prevLine}
+                    </Typography>
+                    <Typography variant="h3">
+                      {currentLines.currLine}
+                    </Typography>
+                  </>
+                )}
+              </div>
+            )}
+          </FindCurrentTranscript>
+        )}
       </div>
     </VideoDetailsLayout>
   );

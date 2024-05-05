@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { PlayerState, TranscriptLine } from "./[id]";
+import { PlayerState, TranscriptLine } from "./types";
 
 type CurrentLines = {
   prevLine?: string;
@@ -7,7 +7,7 @@ type CurrentLines = {
   nextLine?: string;
 };
 
-export const FindCurrentTranscript = ({
+const FindCurrentTranscript = ({
   transcript,
   player,
   children,
@@ -77,3 +77,5 @@ export const FindCurrentTranscript = ({
 
   return <>{children({ currentLines })}</>;
 };
+
+export default FindCurrentTranscript;
