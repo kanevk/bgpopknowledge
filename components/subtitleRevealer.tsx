@@ -1,19 +1,20 @@
-import styled from "@emotion/styled";
-import { Box, Typography } from "@mui/material";
+import { Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 
-function SubtitleRevealer({
-  text,
-  prevLine,
-}: {
-  text: string;
-  prevLine: string;
-}) {
+function SubtitleRevealer({ text }: { text: string }) {
   const words = text?.split(" ") || [];
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <div className="subtitle-container">
-      <Typography variant="h3" maxWidth={900} marginX={10}>
+      <Typography
+        variant={isMobile ? "h6" : "body1"}
+        maxWidth={900}
+        color={theme.palette.common.white}
+        {...(isMobile ? {} : { marginX: 15 })}
+      >
         {words.map((word, index) => (
           <Typography
             key={`${word}-${index}`}

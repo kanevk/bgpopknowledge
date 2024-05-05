@@ -3,10 +3,10 @@ import { useRouter } from "next/router";
 import {
   Typography,
   CircularProgress,
-  useMediaQuery,
   useTheme,
   Stack,
   Link,
+  Box,
 } from "@mui/material";
 import { ReactNode, useEffect, useState } from "react";
 import YouTube from "react-youtube";
@@ -27,13 +27,6 @@ const FindCurrentTranscript = dynamic(
   },
 );
 
-const DraggableSubtitles = dynamic(
-  () => import("../../components/DraggableSubtitles"),
-  {
-    ssr: false,
-  },
-);
-
 type Props = {
   videoData: VideoData;
 };
@@ -43,7 +36,6 @@ let loadSubtitlesIntervalId: NodeJS.Timer;
 const VideoDetails: NextPage<Props> = ({ videoData }) => {
   const router = useRouter();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const id = router.query.id as string | undefined;
 
@@ -173,35 +165,26 @@ const VideoDetails: NextPage<Props> = ({ videoData }) => {
           onStateChange={handlePlayerStateChange}
           videoId={id}
         />
-        {currentPlayer && (
-          <FindCurrentTranscript transcript={transcript} player={currentPlayer}>
-            {({ currentLines }) => (
-              // <DraggableSubtitles transcriptLine={currentLines?.currLine} />
-              <div style={{ textAlign: "center" }}>
-                {/* {isMobile ? (
-                  <Typography variant="h5">{currentLines.currLine}</Typography>
-                ) : ( */}
-                <>
-                  {/* <Typography
-                      variant="h3"
-                      color={(theme) => theme.palette.text.secondary}
-                    >
-                      {currentLines.prevLine}
-                    </Typography> */}
-                  <SubtitleRevealer
-                    prevLine={currentLines.prevLine}
-                    text={currentLines.currLine}
-                  />
-                  {/*
-                    <Typography variant="h3">
-                      {currentLines.currLine}
-                    </Typography> */}
-                </>
-                {/* )} */}
-              </div>
-            )}
-          </FindCurrentTranscript>
-        )}
+        <Box
+          sx={{
+            backgroundColor: theme.palette.common.black,
+          }}
+          width={"100%"}
+          height={"100%"}
+        >
+          {currentPlayer && (
+            <FindCurrentTranscript
+              transcript={transcript}
+              player={currentPlayer}
+            >
+              {({ currentLines }) => (
+                <div style={{ textAlign: "center" }}>
+                  <SubtitleRevealer text={currentLines.currLine} />
+                </div>
+              )}
+            </FindCurrentTranscript>
+          )}
+        </Box>
       </div>
     </VideoDetailsLayout>
   );
